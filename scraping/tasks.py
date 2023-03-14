@@ -8,7 +8,6 @@ from asgiref.sync import sync_to_async
 import openai
 from decouple import config
 
-# openai.api_key = "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"
 openai.api_key = config('OPENAI_API_KEY')
 
 @sync_to_async
@@ -74,11 +73,9 @@ def parse_tweets(selector: Selector):
             "username": tweet.xpath(".//*[@data-testid='User-Names']/div[1]//text()").get(),
             "handle": tweet.xpath(".//*[@data-testid='User-Names']/div[2]//text()").get(),
             "datetime": tweet.xpath(".//time/@datetime").get(),
-            # "verified": bool(tweet.xpath(".//svg[@data-testid='icon-verified']")),
             "url": tweet.xpath(".//time/../@href").get(),
             "image": tweet.xpath(".//*[@data-testid='tweetPhoto']/img/@src").get(),
             "video": tweet.xpath(".//video/@src").get(),
-            # "video_thumb": tweet.xpath(".//video/@poster").get(),
             "likes": tweet.xpath(".//*[@data-testid='like']//text()").get(),
             "retweets": tweet.xpath(".//*[@data-testid='retweet']//text()").get(),
             "replies": tweet.xpath(".//*[@data-testid='reply']//text()").get(),
@@ -125,7 +122,6 @@ async def run(playwright):
 
                 datetime_var =  tweets[-1]['datetime']
                 page_scroll += 1
-
 
             print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
