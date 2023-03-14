@@ -1,0 +1,187 @@
+import asyncio
+from parsel import Selector
+from playwright.async_api import async_playwright
+from datetime import datetime
+from celery import shared_task
+from .models import Tweet
+from asgiref.sync import sync_to_async
+import openai
+from decouple import config
+
+# openai.api_key = "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"
+openai.api_key = config('OPENAI_API_KEY')
+
+@sync_to_async
+def get_tweet_by_id(id):
+    tweet = Tweet.objects.filter(tweet_id=id)
+    return tweet
+
+@sync_to_async
+def save_item_to_db(id, data):
+
+    if 'image' not in data:
+        data['image'] = ''
+    if 'video' not in data:
+        data['video'] = ''
+
+    try:
+        Tweet.objects.create(
+            publish_date = data['datetime'],
+            tweet_id = id,
+            user_name = data['username'],
+            image_url = data['image'],
+            video_url = data['video'],
+            text = data['text'],
+            handle = data['handle'],
+            likes = data['likes'],
+            retweets = data['retweets'],
+            replies = data['replies'],
+            views = data['views'],
+            sentiment = '',
+        )
+        print(f"item {id} created")
+
+    except Exception as e:
+        print(f'failed at create item {id}')
+        print(e)
+    
+
+# @sync_to_async
+# @shared_task
+async def save_data(data):
+    print('in save_data function')
+    for k in data.keys():
+        id = k
+        try:
+            tweet = await get_tweet_by_id(id)
+            print(tweet)
+        except Exception as e:
+            print(f'Exception at finding tweet by id: {k}')
+            print(e)
+            pass
+        finally:
+            await save_item_to_db(id, data[id])
+        
+
+# @shared_task
+def parse_tweets(selector: Selector):
+    results = []
+
+    tweets = selector.xpath("//article[@data-testid='tweet']")
+    for tweet in tweets:
+        found = {
+            "text": "".join(tweet.xpath(".//*[@data-testid='tweetText']//text()").getall()),
+            "username": tweet.xpath(".//*[@data-testid='User-Names']/div[1]//text()").get(),
+            "handle": tweet.xpath(".//*[@data-testid='User-Names']/div[2]//text()").get(),
+            "datetime": tweet.xpath(".//time/@datetime").get(),
+            # "verified": bool(tweet.xpath(".//svg[@data-testid='icon-verified']")),
+            "url": tweet.xpath(".//time/../@href").get(),
+            "image": tweet.xpath(".//*[@data-testid='tweetPhoto']/img/@src").get(),
+            "video": tweet.xpath(".//video/@src").get(),
+            # "video_thumb": tweet.xpath(".//video/@poster").get(),
+            "likes": tweet.xpath(".//*[@data-testid='like']//text()").get(),
+            "retweets": tweet.xpath(".//*[@data-testid='retweet']//text()").get(),
+            "replies": tweet.xpath(".//*[@data-testid='reply']//text()").get(),
+            "views": (tweet.xpath(".//*[contains(@aria-label,'Views')]").re("(\d+) Views") or [None])[0],
+        }
+        results.append({k: v for k, v in found.items() if v is not None})
+
+    return results
+
+# @shared_task
+async def run(playwright):
+    accounts = ["BarackObama", "CathieDWood", "elonmusk"]
+    # accounts = ["BarackObama"]
+    final_id_val_data = {}
+    try:
+        for account in accounts:
+            print(f"Scraping data for {account}\n")
+
+            chromium = playwright.chromium # or "firefox" or "webkit".
+            # browser = await chromium.launch() # default, when using proxy use following settings
+            browser = await chromium.launch(proxy={
+            "server": "socks5://127.0.0.1:10808",
+            })
+
+            page = await browser.new_page()
+
+            Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
+
+            await page.goto("https://twitter.com/"+account)
+            raw_data = []
+
+            datetime_var = datetime.now().isoformat()
+            page_scroll = 1
+
+            while datetime_var > Feb1st:
+                await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
+                await page.wait_for_selector("//article[@data-testid='tweet']") 
+                html = await page.content()
+                # parse it for data:
+                selector = Selector(html)
+                tweets = parse_tweets(selector)
+                print(tweets[-1]['datetime'])
+                raw_data.extend(tweets)
+
+                datetime_var =  tweets[-1]['datetime']
+                page_scroll += 1
+
+
+            print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
+
+            # final_id_val_data = {}
+            for tw in raw_data:
+                if tw['handle'] == "@"+account:
+                    key = tw['url'].split("/")[-1]
+                    final_id_val_data[key] = tw
+
+            await browser.close()
+
+            print("Next step: save function\n")
+            save = save_data(final_id_val_data)
+        return await save
+        # return save_data(final_id_val_data)
+
+    except Exception as e:
+        print('The scraping job failed. See exception:')
+        print(e)  
+
+# @shared_task
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+
+@shared_task
+def scraping_method():
+    asyncio.run(main())
+
+def sentiment_detection_openai(tweet):
+    the_prompt = "Classify the sentiment in this tweet:\n\n " + tweet + "\n\n"
+    # print(the_prompt)
+    response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=the_prompt,
+        temperature=0,
+        max_tokens=300,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+    )
+
+    return response['choices'][0]['text'].replace("\n", "").strip()
+
+@shared_task
+def sentiment_detection():
+    print('_____________ sentimetn_detection Starts Running _____________')
+    queryset = Tweet.objects.all()
+    cntr = 0
+    for tweet in queryset:
+        if tweet.sentiment == '' and tweet.text != '':
+            tweet.sentiment = sentiment_detection_openai(tweet.text)
+            tweet.save()
+            print(f'{tweet.sentiment} saved for tweet: {tweet.tweet_id} by {tweet.handle}')
+
+            cntr += 1
+            if cntr > 25:
+                print('Reached OpenAI limit rate, BREAK!')
+                break # openAi 60/min Limit rate
