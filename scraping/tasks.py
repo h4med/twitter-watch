@@ -98,10 +98,10 @@ async def run(playwright):
             print(f"Scraping data for {account}\n")
 
             chromium = playwright.chromium # or "firefox" or "webkit".
-            # browser = await chromium.launch() # default, when using proxy use following settings
-            browser = await chromium.launch(proxy={
-            "server": "socks5://127.0.0.1:10808",
-            })
+            browser = await chromium.launch() # default, when using proxy use following settings
+            # browser = await chromium.launch(proxy={
+            # "server": "socks5://127.0.0.1:10808",
+            # })
 
             page = await browser.new_page()
 
