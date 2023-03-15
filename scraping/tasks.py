@@ -22,8 +22,8 @@ def save_item_to_db(id, data):
         data['image'] = ''
     if 'video' not in data:
         data['video'] = ''
-    if 'handle' not in data:
-        data['handle'] = "@"+data['url'].split("/")[0]
+    # if 'handle' not in data:
+    #     data['handle'] = "@"+data['url'].split("/")[0]
 
     user= data['handle']
     try:
@@ -47,18 +47,19 @@ def save_item_to_db(id, data):
         print(f"failed at create/update item {id} for {user}")
         print(e)
 
-async def save_data(data):
+async def save_data(data, account):
     print('in save_data function')
     if 'handle' not in data:
-        data['handle'] = "@"+data['url'].split("/")[0]
-        
+        data['handle'] = "@"+account
+        user = data["handle"]
+
     for k in data.keys():
         id = k
         try:
             tweet = await get_tweet_by_id(id)
             print(tweet)
         except Exception as e:
-            user = data["handle"]
+            
             print(f'Exception at finding tweet by id: {k} from {user}')
             print(e)
             pass
@@ -143,7 +144,7 @@ async def run(playwright):
         await browser.close()
 
         print("Next step: save function\n")
-        save = save_data(final_id_val_data)
+        save = save_data(final_id_val_data, account)
     return await save
 
     # except Exception as e:
