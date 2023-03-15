@@ -115,8 +115,11 @@ async def run(playwright):
 
             print(tweets[-1]['datetime'])
 
-            if 'handle' not in tweets:
-                tweets['handle'] = "@"+account
+            i = 0
+            for anytw in tweets:
+                if 'handle' not in anytw:
+                    tweets[i]['handle'] = "@"+account
+                i +=1
 
             raw_data.extend(tweets)
 
