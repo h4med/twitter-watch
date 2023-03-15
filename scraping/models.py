@@ -13,7 +13,7 @@ class Tweet(models.Model):
     retweets = models.CharField(max_length=16)
     replies = models.CharField(max_length=16)
     views = models.CharField(max_length=16)
-    sentiment = models.CharField(max_length=256)
+    sentiment = models.CharField(max_length=256, default="")
 
 class Meta:
     ordering = ['-publish_date']
