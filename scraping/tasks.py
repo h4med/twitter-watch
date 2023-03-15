@@ -103,7 +103,7 @@ async def run(playwright):
         raw_data = []
 
         datetime_var = datetime.now().isoformat()
-        page_scroll = 1
+        page_scroll = 0
 
         while datetime_var > Feb1st:
             await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
@@ -112,7 +112,12 @@ async def run(playwright):
             # parse it for data:
             selector = Selector(html)
             tweets = parse_tweets(selector)
+
             print(tweets[-1]['datetime'])
+
+            if 'handle' not in tweets:
+                tweets['handle'] = "@"+account
+
             raw_data.extend(tweets)
 
             datetime_var =  tweets[-1]['datetime']
