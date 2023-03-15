@@ -49,6 +49,9 @@ def save_item_to_db(id, data):
 
 async def save_data(data):
     print('in save_data function')
+    if 'handle' not in data:
+        data['handle'] = "@"+data['url'].split("/")[0]
+        
     for k in data.keys():
         id = k
         try:
