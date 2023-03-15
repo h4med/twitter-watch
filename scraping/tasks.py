@@ -84,57 +84,56 @@ def parse_tweets(selector: Selector):
 
 async def run(playwright):
     accounts = ["BarackObama", "CathieDWood", "elonmusk"]
-    # accounts = ["BarackObama"]
     final_id_val_data = {}
-    try:
-        for account in accounts:
-            print(f"Scraping data for {account}\n")
+    # try:
+    for account in accounts:
+        print(f"Scraping data for {account}\n")
 
-            chromium = playwright.chromium # or "firefox" or "webkit".
-            browser = await chromium.launch() # default, when using proxy use following settings
-            # browser = await chromium.launch(proxy={
-            # "server": "socks5://127.0.0.1:10808",
-            # })
+        chromium = playwright.chromium # or "firefox" or "webkit".
+        browser = await chromium.launch() # default, when using proxy use following settings
+        # browser = await chromium.launch(proxy={
+        # "server": "socks5://127.0.0.1:10808",
+        # })
 
-            page = await browser.new_page()
+        page = await browser.new_page()
 
-            Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
+        Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
 
-            await page.goto("https://twitter.com/"+account)
-            raw_data = []
+        await page.goto("https://twitter.com/"+account)
+        raw_data = []
 
-            datetime_var = datetime.now().isoformat()
-            page_scroll = 1
+        datetime_var = datetime.now().isoformat()
+        page_scroll = 1
 
-            while datetime_var > Feb1st:
-                await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
-                await page.wait_for_selector("//article[@data-testid='tweet']") 
-                html = await page.content()
-                # parse it for data:
-                selector = Selector(html)
-                tweets = parse_tweets(selector)
-                print(tweets[-1]['datetime'])
-                raw_data.extend(tweets)
+        while datetime_var > Feb1st:
+            await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
+            await page.wait_for_selector("//article[@data-testid='tweet']") 
+            html = await page.content()
+            # parse it for data:
+            selector = Selector(html)
+            tweets = parse_tweets(selector)
+            print(tweets[-1]['datetime'])
+            raw_data.extend(tweets)
 
-                datetime_var =  tweets[-1]['datetime']
-                page_scroll += 1
+            datetime_var =  tweets[-1]['datetime']
+            page_scroll += 1
 
-            print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
+        print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
-            for tw in raw_data:
-                if tw['handle'] == "@"+account:
-                    key = tw['url'].split("/")[-1]
-                    final_id_val_data[key] = tw
+        for tw in raw_data:
+            if tw['handle'] == "@"+account:
+                key = tw['url'].split("/")[-1]
+                final_id_val_data[key] = tw
 
-            await browser.close()
+        await browser.close()
 
-            print("Next step: save function\n")
-            save = save_data(final_id_val_data)
-        return await save
+        print("Next step: save function\n")
+        save = save_data(final_id_val_data)
+    return await save
 
-    except Exception as e:
-        print('The scraping job failed. See exception:')
-        print(e)  
+    # except Exception as e:
+    #     print('____The scraping job for failed. See exception:')
+    #     print(e)  
 
 async def main():
     async with async_playwright() as playwright:
@@ -174,5 +173,5 @@ def sentiment_detection():
             if cntr > 25:
                 print('Reached OpenAI limit rate, BREAK!')
                 break # openAi Limit rate
-        else:
-            print('No Tweet without sentiment or text to detect sentiment!')
+    if cntr == 0:
+        print('No Tweet without sentiment OR text, to detect the sentiment!')
