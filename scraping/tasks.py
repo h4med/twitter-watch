@@ -37,10 +37,11 @@ def save_item_to_db(id, data):
             replies = data['replies'],
             views = data['views'],
         )
-        print(f"item {id} created/updated for {data['handle']}")
+        handle= data['handle']
+        print(f"item {id} created/updated for {handle}")
 
     except Exception as e:
-        print(f"failed at create/update item {id} for {data['handle']}")
+        print(f"failed at create/update item {id} for {handle}")
         print(e)
 
 async def save_data(data):
