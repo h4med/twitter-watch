@@ -37,11 +37,11 @@ def save_item_to_db(id, data):
             replies = data['replies'],
             views = data['views'],
         )
-        handle= data['handle']
-        print(f"item {id} created/updated for {handle}")
+        user= data['handle']
+        print(f"item {id} created/updated for {user}")
 
     except Exception as e:
-        print(f"failed at create/update item {id} for {handle}")
+        print(f"failed at create/update item {id} for {user}")
         print(e)
 
 async def save_data(data):
@@ -52,7 +52,8 @@ async def save_data(data):
             tweet = await get_tweet_by_id(id)
             print(tweet)
         except Exception as e:
-            print(f'Exception at finding tweet by id: {k} from {data["handle"]}')
+            user = data["handle"]
+            print(f'Exception at finding tweet by id: {k} from {user}')
             print(e)
             pass
         finally:
