@@ -22,7 +22,9 @@ def save_item_to_db(id, data):
         data['image'] = ''
     if 'video' not in data:
         data['video'] = ''
-        
+    if 'handle' not in data:
+        data['handle'] = "@"+data['url'].split("/")[0]
+
     user= data['handle']
     try:
         Tweet.objects.aupdate_or_create(
@@ -116,11 +118,11 @@ async def run(playwright):
 
             print(tweets[-1]['datetime'])
 
-            i = 0
-            for anytw in tweets:
-                if 'handle' not in anytw:
-                    tweets[i]['handle'] = "@"+account
-                i +=1
+            # i = 0
+            # for anytw in tweets:
+            #     if 'handle' not in anytw:
+            #         tweets[i]['handle'] = "@"+account
+            #     i +=1
 
             raw_data.extend(tweets)
 
