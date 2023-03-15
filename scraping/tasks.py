@@ -121,6 +121,7 @@ async def run(playwright):
         print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
         for tw in raw_data:
+            print(tw)
             if tw['handle'] == "@"+account:
                 key = tw['url'].split("/")[-1]
                 final_id_val_data[key] = tw
