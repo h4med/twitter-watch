@@ -22,7 +22,8 @@ def save_item_to_db(id, data):
         data['image'] = ''
     if 'video' not in data:
         data['video'] = ''
-
+        
+    user= data['handle']
     try:
         Tweet.objects.aupdate_or_create(
             publish_date = data['datetime'],
@@ -37,7 +38,7 @@ def save_item_to_db(id, data):
             replies = data['replies'],
             views = data['views'],
         )
-        user= data['handle']
+        
         print(f"item {id} created/updated for {user}")
 
     except Exception as e:
@@ -129,7 +130,7 @@ async def run(playwright):
         print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
         for tw in raw_data:
-            print(tw)
+            # print(tw)
             if tw['handle'] == "@"+account:
                 key = tw['url'].split("/")[-1]
                 final_id_val_data[key] = tw
