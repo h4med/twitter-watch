@@ -174,3 +174,5 @@ def sentiment_detection():
             if cntr > 25:
                 print('Reached OpenAI limit rate, BREAK!')
                 break # openAi Limit rate
+        else:
+            print('No Tweet without sentiment or text to detect sentiment!')
