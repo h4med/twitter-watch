@@ -24,7 +24,7 @@ def save_item_to_db(id, data):
         data['video'] = ''
 
     try:
-        Tweet.objects.create(
+        Tweet.objects.aupdate_or_create(
             publish_date = data['datetime'],
             tweet_id = id,
             user_name = data['username'],
@@ -36,12 +36,11 @@ def save_item_to_db(id, data):
             retweets = data['retweets'],
             replies = data['replies'],
             views = data['views'],
-            sentiment = '',
         )
-        print(f"item {id} created")
+        print(f"item {id} created/updated for {data['handle']}")
 
     except Exception as e:
-        print(f'failed at create item {id}')
+        print(f"failed at create/update item {id} for {data['handle']}")
         print(e)
 
 async def save_data(data):
@@ -52,7 +51,7 @@ async def save_data(data):
             tweet = await get_tweet_by_id(id)
             print(tweet)
         except Exception as e:
-            print(f'Exception at finding tweet by id: {k}')
+            print(f'Exception at finding tweet by id: {k} from {data["handle"]}')
             print(e)
             pass
         finally:
