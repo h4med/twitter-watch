@@ -1,11 +1,8 @@
 from django.db import models
 
-# Create your models here.
-
 class Tweet(models.Model):
     publish_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
-    # url = models.CharField(max_length=2083, default="", unique=True)
     tweet_id = models.PositiveBigIntegerField(unique=True)
     user_name = models.CharField(max_length=256)
     image_url = models.CharField(max_length=256, default="")
@@ -20,7 +17,6 @@ class Tweet(models.Model):
 
 class Meta:
     ordering = ['-publish_date']
-
 
 def __str__(self):
     return self.url

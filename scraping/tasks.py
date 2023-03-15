@@ -43,10 +43,7 @@ def save_item_to_db(id, data):
     except Exception as e:
         print(f'failed at create item {id}')
         print(e)
-    
 
-# @sync_to_async
-# @shared_task
 async def save_data(data):
     print('in save_data function')
     for k in data.keys():
@@ -61,8 +58,6 @@ async def save_data(data):
         finally:
             await save_item_to_db(id, data[id])
         
-
-# @shared_task
 def parse_tweets(selector: Selector):
     results = []
 
@@ -85,7 +80,7 @@ def parse_tweets(selector: Selector):
 
     return results
 
-# @shared_task
+
 async def run(playwright):
     accounts = ["BarackObama", "CathieDWood", "elonmusk"]
     # accounts = ["BarackObama"]
@@ -125,7 +120,6 @@ async def run(playwright):
 
             print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
-            # final_id_val_data = {}
             for tw in raw_data:
                 if tw['handle'] == "@"+account:
                     key = tw['url'].split("/")[-1]
@@ -136,13 +130,11 @@ async def run(playwright):
             print("Next step: save function\n")
             save = save_data(final_id_val_data)
         return await save
-        # return save_data(final_id_val_data)
 
     except Exception as e:
         print('The scraping job failed. See exception:')
         print(e)  
 
-# @shared_task
 async def main():
     async with async_playwright() as playwright:
         await run(playwright)
@@ -180,4 +172,4 @@ def sentiment_detection():
             cntr += 1
             if cntr > 25:
                 print('Reached OpenAI limit rate, BREAK!')
-                break # openAi 60/min Limit rate
+                break # openAi Limit rate

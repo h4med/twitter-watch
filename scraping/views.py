@@ -5,7 +5,7 @@ from .models import Tweet
 from .serializers import TweetDetailSerializer, TweetListSerializer
 
 class TweetsList(generics.ListAPIView):
-    queryset = Tweet.objects.all()
+    queryset = Tweet.objects.all().order_by('-publish_date')
     serializer_class = TweetListSerializer
 
     
@@ -14,7 +14,7 @@ class TweetsByAccountList(generics.ListAPIView):
 
     def get_queryset(self):
         account = self.kwargs['account']
-        return Tweet.objects.filter(handle=account)
+        return Tweet.objects.filter(handle=account).order_by('-publish_date')
     
 class TweetByAccountDetail(generics.ListAPIView):
     serializer_class = TweetDetailSerializer
