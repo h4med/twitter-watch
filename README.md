@@ -21,7 +21,7 @@ CELERY_BEAT_SCHEDULE = {
 }
 ```
 Task1 is the Scraper which directly scrapes data from three accounts every 5 minutes and save the results in `db.sqlite`.   
-Task2 is responsible for sentiment detection using OpenAI's `text-davinci-003` Model. It checks the databse every 7 minutes and if a tweet does note have sentiment (` == ''`) then detect and record it in DB.   
+Task2 is responsible for sentiment detection using OpenAI's `text-davinci-003` model. It checks the database every 7 minutes and if a tweet does note have sentiment (` == ''`) then detects and records it in the DB.   
 Both tasks are defined in `scraping\task.py`   
 
 ## Run
