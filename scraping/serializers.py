@@ -5,7 +5,6 @@ class TweetListSerializer(serializers.ModelSerializer):
     tweet_url = serializers.SerializerMethodField()
     class Meta:
         model = Tweet
-        # fields = '__all__'
         fields = (
             'handle',            
             'publish_date',
@@ -25,7 +24,6 @@ class TweetDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tweet
-        # fields = '__all__'
         fields = (
             'handle',            
             'publish_date',
