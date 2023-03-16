@@ -33,7 +33,7 @@ class TweetListSerializer(serializers.ModelSerializer):
             'tweet_id',
         )
 
-class TweetDetailSerializer(serializers.ModelSerializer):
+class TweetDetailSerializerWithURL(serializers.ModelSerializer):
     tweet_url = serializers.SerializerMethodField()
 
     class Meta:
