@@ -6,9 +6,8 @@ class TweetDetailSerializer(serializers.ModelSerializer):
         model = Tweet
         # fields = '__all__'
         fields = (
-            'publish_date',            
-            'user_name',
-            'handle',
+            'handle',            
+            'publish_date',
             'text',
             'sentiment',
             'image_url',
@@ -26,9 +25,8 @@ class TweetListSerializer(serializers.ModelSerializer):
         model = Tweet
         # fields = '__all__'
         fields = (
+            'handle',            
             'publish_date',
-            'user_name',
-            'handle',
             'text',
             'sentiment',
             'created_at',

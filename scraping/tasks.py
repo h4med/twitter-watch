@@ -22,8 +22,8 @@ def save_item_to_db(id, data):
         data['image'] = ''
     if 'video' not in data:
         data['video'] = ''
-    # if 'handle' not in data:
-    #     data['handle'] = "@"+data['url'].split("/")[0]
+    if 'username' not in data:
+        data['username'] = ''
 
     user= data['handle']
     try:
@@ -49,18 +49,15 @@ def save_item_to_db(id, data):
 
 async def save_data(data, account):
     print('in save_data function')
-    if 'handle' not in data:
-        data['handle'] = "@"+account
-        user = data["handle"]
+    # print(data)
 
-    for k in data.keys():
-        id = k
+    for id in data.keys():
         try:
             tweet = await get_tweet_by_id(id)
             print(tweet)
         except Exception as e:
-            
-            print(f'Exception at finding tweet by id: {k} from {user}')
+            user = data[id]["handle"]
+            print(f'Exception at finding tweet by id: {id} from {user}')
             print(e)
             pass
         finally:
@@ -91,65 +88,70 @@ def parse_tweets(selector: Selector):
 
 async def run(playwright):
     accounts = ["BarackObama", "CathieDWood", "elonmusk"]
+    # accounts = ["BarackObama"]
     final_id_val_data = {}
-    # try:
-    for account in accounts:
-        print(f"Scraping data for {account}\n")
+    try:
+        for account in accounts:
+            print(f"Scraping data for {account}\n")
 
-        chromium = playwright.chromium # or "firefox" or "webkit".
-        browser = await chromium.launch() # default, when using proxy use following settings
-        # browser = await chromium.launch(proxy={
-        # "server": "socks5://127.0.0.1:10808",
-        # })
+            chromium = playwright.chromium # or "firefox" or "webkit".
+            browser = await chromium.launch() # default, when using proxy use following settings
+            # browser = await chromium.launch(proxy={
+            # "server": "socks5://127.0.0.1:10808",
+            # })
 
-        page = await browser.new_page()
+            page = await browser.new_page()
 
-        Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
+            Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
+            # Feb1st = datetime(2023,3,5,0,0,0,0).isoformat() # for shorter tests
 
-        await page.goto("https://twitter.com/"+account)
-        raw_data = []
 
-        datetime_var = datetime.now().isoformat()
-        page_scroll = 0
+            await page.goto("https://twitter.com/"+account)
+            raw_data = []
 
-        while datetime_var > Feb1st:
-            await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
-            await page.wait_for_selector("//article[@data-testid='tweet']") 
-            html = await page.content()
-            # parse it for data:
-            selector = Selector(html)
-            tweets = parse_tweets(selector)
+            datetime_var = datetime.now().isoformat()
+            page_scroll = 0
 
-            print(tweets[-1]['datetime'])
+            while datetime_var > Feb1st:
+                await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
+                await page.wait_for_selector("//article[@data-testid='tweet']") 
+                html = await page.content()
+                # parse it for data:
+                selector = Selector(html)
+                tweets = parse_tweets(selector)
 
-            i = 0
-            for anytw in tweets:
-                if 'handle' not in anytw:
-                    tweets[i]['handle'] = "@"+account
-                i +=1
+                print("page: ", page_scroll, " -- " ,tweets[-1]['datetime'])
+                # print(tweets)
 
-            raw_data.extend(tweets)
+                i = 0
+                for anytw in tweets:
+                    if 'handle' not in anytw:
+                        tweets[i]['handle'] = "@"+account
+                    i +=1
 
-            datetime_var =  tweets[-1]['datetime']
-            page_scroll += 1
+                raw_data.extend(tweets)
 
-        print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
+                datetime_var =  tweets[-1]['datetime']
+                page_scroll += 1
 
-        for tw in raw_data:
-            # print(tw)
-            if tw['handle'] == "@"+account:
-                key = tw['url'].split("/")[-1]
-                final_id_val_data[key] = tw
+            print(f"Reached Feb 1st 2023, after {page_scroll} pages of scrolling")
 
-        await browser.close()
+            for tw in raw_data:
+                # print(tw)
+                # print("-------------------------------")
+                if tw['handle'] == "@"+account:
+                    key = tw['url'].split("/")[-1]
+                    final_id_val_data[key] = tw
 
-        print("Next step: save function\n")
-        save = save_data(final_id_val_data, account)
-    return await save
+            await browser.close()
 
-    # except Exception as e:
-    #     print('____The scraping job for failed. See exception:')
-    #     print(e)  
+            print("Next step: save function\n")
+            save = save_data(final_id_val_data, account)
+        return await save
+
+    except Exception as e:
+        print('____The scraping job for failed. See exception:')
+        print(e)  
 
 async def main():
     async with async_playwright() as playwright:
