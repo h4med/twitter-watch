@@ -119,8 +119,8 @@ async def run(playwright):
                 # parse it for data:
                 selector = Selector(html)
                 tweets = parse_tweets(selector)
-
-                print("page: ", page_scroll, " -- " ,tweets[-1]['datetime'])
+                last_date_scrapped = tweets[-1]['datetime']
+                print(f"page: {page_scroll} -- {last_date_scrapped}")
                 # print(tweets)
 
                 i = 0
