@@ -29,3 +29,7 @@ You can simply run the project using docker-compose:
 ```
 docker-compose up --build -d
 ```
+And head over to **url:8000/tweets** to see ther results in JSON format.   
+**url:8000/tweets/@handle** is for every account and    
+**url:8000/tweets/@handle/<id>** is for each tweet with details such as View count and number of comments etc.   
+
