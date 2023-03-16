@@ -31,5 +31,24 @@ docker-compose up --build -d
 ```
 And head over to **url:8000/tweets** to see the results in JSON format.   
 **url:8000/tweets/@handle** returns the tweets for every account and    
-**url:8000/tweets/@handle/id** is for each tweet with details such as View count, number of comments and etc.   
+**url:8000/tweets/@handle/id** is for each tweet with details such as "likes", "retweets" and etc.   
+```
+[
+    {
+        "handle": "@elonmusk",
+        "publish_date": "2023-03-16T17:10:48Z",
+        "text": "You’re terrible & I love you",
+        "sentiment": "Mixed sentiment.",
+        "tweet_url": "https://twitter.com/elonmusk/status/1636414725549592576",
+        "image_url": "",
+        "video_url": "",
+        "created_at": "2023-03-16T17:15:13.182073Z",
+        "tweet_id": 1636414725549592576,
+        "likes": "8,441",
+        "retweets": "1,369",
+        "replies": "2,120",
+        "views": "274360"
+    }
+]
+```
 
