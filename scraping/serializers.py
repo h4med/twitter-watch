@@ -56,5 +56,5 @@ class TweetDetailSerializerWithURL(serializers.ModelSerializer):
         )
     
     def get_tweet_url(self, obj):
-        url = "https://twitter.com/"+obj.handle[1:]+"/status/"+obj.tweet_id
+        url = "https://twitter.com/"+obj.handle[1:]+"/status/"+str(obj.tweet_id)
         return url
