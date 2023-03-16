@@ -27,7 +27,7 @@ def save_item_to_db(id, data):
 
     user= data['handle']
     try:
-        Tweet.objects.aupdate_or_create(
+        Tweet.objects.update_or_create(
             publish_date = data['datetime'],
             tweet_id = id,
             user_name = data['username'],
