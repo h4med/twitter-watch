@@ -27,20 +27,35 @@ def save_item_to_db(id, data):
 
     user= data['handle']
     try:
+        # Tweet.objects.update_or_create(
+        #     publish_date = data['datetime'],
+        #     tweet_id = id,
+        #     user_name = data['username'],
+        #     image_url = data['image'],
+        #     video_url = data['video'],
+        #     text = data['text'],
+        #     handle = data['handle'],
+        #     likes = data['likes'],
+        #     retweets = data['retweets'],
+        #     replies = data['replies'],
+        #     views = data['views'],
+        # )
         Tweet.objects.update_or_create(
-            publish_date = data['datetime'],
             tweet_id = id,
-            user_name = data['username'],
-            image_url = data['image'],
-            video_url = data['video'],
-            text = data['text'],
-            handle = data['handle'],
-            likes = data['likes'],
-            retweets = data['retweets'],
-            replies = data['replies'],
-            views = data['views'],
+            publish_date = data['datetime'],
+            defaults={
+                'user_name' : data['username'],
+                'image_url' : data['image'],
+                'video_url' : data['video'],
+                'text' : data['text'],
+                'handle' : data['handle'],
+                'likes' : data['likes'],
+                'retweets' : data['retweets'],
+                'replies' : data['replies'],
+                'views' : data['views'],            
+            }
         )
-        
+
         print(f"item {id} created/updated for {user}")
 
     except Exception as e:
