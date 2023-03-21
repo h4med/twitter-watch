@@ -12,16 +12,16 @@ Task1 and Task2 are the core of application. We configure these tasks in `twitte
 CELERY_BEAT_SCHEDULE = {
     'scraping_task': {
         'task': 'scraping.tasks.scraping_method',
-        'schedule': 60 * 5,
+        'schedule': 60 * 15,
     },
     'sentiment_detection_task': {
         'task': 'scraping.tasks.sentiment_detection',
-        'schedule': 60 * 7,
+        'schedule': 60 * 17,
     }
 }
 ```
-Task1 is the Scraper which directly scrapes data from three accounts every 5 minutes and save the results in `db.sqlite`.   
-Task2 is responsible for sentiment detection using OpenAI's `text-davinci-003` model. It checks the database every 7 minutes and if a tweet does note have sentiment (` == ''`) then detects and records it in the DB.   
+Task1 is the Scraper which directly scrapes data from three accounts every 15 minutes and save the results in `db.sqlite`.   
+Task2 is responsible for sentiment detection using OpenAI's `text-davinci-003` model. It checks the database every 17 minutes and if a tweet does note have a sentiment in DB (` == ''`) then detects vi API and records it in the DB.   
 Both tasks are defined in `scraping\tasks.py`   
 
 ## Run

@@ -119,10 +119,10 @@ CELERY_BROKER_URL = 'redis://redis:6379/1'
 CELERY_BEAT_SCHEDULE = {
     'scraping_task': {
         'task': 'scraping.tasks.scraping_method',
-        'schedule': 60 * 5,
+        'schedule': 60 * 15,
     },
     'sentiment_detection_task': {
         'task': 'scraping.tasks.sentiment_detection',
-        'schedule': 60 * 6,
+        'schedule': 60 * 16,
     }
 }
