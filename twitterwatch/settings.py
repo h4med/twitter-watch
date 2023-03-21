@@ -123,6 +123,6 @@ CELERY_BEAT_SCHEDULE = {
     },
     'sentiment_detection_task': {
         'task': 'scraping.tasks.sentiment_detection',
-        'schedule': 60 * 7,
+        'schedule': 60 * 6,
     }
 }

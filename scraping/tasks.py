@@ -1,7 +1,7 @@
 import asyncio
 from parsel import Selector
 from playwright.async_api import async_playwright
-from datetime import datetime
+from datetime import datetime, timedelta
 from celery import shared_task
 from .models import Tweet
 from asgiref.sync import sync_to_async
@@ -104,7 +104,8 @@ async def run(playwright):
 
             page = await browser.new_page()
 
-            Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
+            thirthDaysAgo = (datetime.now() - timedelta(30)).isoformat()
+            # Feb1st = datetime(2023,2,1,0,0,0,0).isoformat()
             # Feb1st = datetime(2023,3,5,0,0,0,0).isoformat() # for shorter tests
 
 
@@ -114,7 +115,7 @@ async def run(playwright):
             datetime_var = datetime.now().isoformat()
             page_scroll = 0
 
-            while datetime_var > Feb1st:
+            while datetime_var > thirthDaysAgo:
                 await page.evaluate(f"window.scrollBy(0, {page_scroll * 720})")
                 await page.wait_for_selector("//article[@data-testid='tweet']") 
                 html = await page.content()
